@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de QR Code do Danzin</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome (para ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- QRCode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Fundo com gradiente suave */
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+        }
+
+        .qr-placeholder {
+            border: 2px dashed #cbd5e1;
+            background-color: #f8fafc;
+        }
+
+        /* Animação suave para exibir os elementos */
+        .fade-in {
+            animation: fadeIn 0.4s ease-in forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Correção para o canvas/img gerado pela biblioteca */
+        #qrcode img, #qrcode canvas {
+            margin: 0 auto;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <main class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transition-all duration-300">
+        
+        <!-- Cabeçalho do Card -->
+        <div class="bg-blue-600 p-6 text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-white rounded-full mb-4 shadow-sm text-blue-600">
+                <i class="fa-solid fa-qrcode text-2xl"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-white mb-1">Gerador de QR Code do Danzin</h1>
+            <p class="text-blue-100 text-sm">Crie códigos QR instantaneamente e baixe em PNG</p>
+        </div>
+
+        <!-- Corpo do Card -->
+        <div class="p-6 md:p-8">
+            <div class="mb-5">
+                <label for="url-input" class="block text-sm font-medium text-gray-700 mb-2">Insira a URL ou texto</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-link text-gray-400"></i>
+                    </div>
+                    <input type="text" id="url-input" 
+                        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-colors duration-200" 
+                        placeholder="Ex: https://meusite.com.br"
+                        autocomplete="off">
+                </div>
+                <p id="error-message" class="mt-2 text-sm text-red-600 hidden">Por favor, insira uma URL válida.</p>
+            </div>
+
+            <button id="generate-btn" 
+                class="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>
+                Gerar QR Code
+            </button>
+
+            <div class="mt-8 pt-6 border-t border-gray-100">
+                <div id="qr-container" class="relative">
+                    <!-- Placeholder (Mostrado inicialmente) -->
+                    <div id="qr-placeholder" class="qr-placeholder w-48 h-48 mx-auto rounded-xl flex flex-col items-center justify-center text-gray-400">
+                        <i class="fa-regular fa-image text-3xl mb-2"></i>
+                        <span class="text-sm font-medium">Seu QR Code</span>
+                    </div>
+
+                    <!-- Área onde o QR Code será renderizado -->
+                    <div id="qrcode" class="hidden flex justify-center p-2 bg-white rounded-xl shadow-sm border border-gray-100"></div>
+                </div>
+
+                <!-- Botão de Download (Oculto inicialmente) -->
+                <button id="download-btn" 
+                    class="hidden mt-6 w-full flex items-center justify-center py-3 px-4 border-2 border-blue-600 rounded-xl shadow-sm text-sm font-semibold text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                    <i class="fa-solid fa-download mr-2"></i>
+                    Baixar Imagem (PNG)
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlInput = document.getElementById('url-input');
+            const generateBtn = document.getElementById('generate-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            const qrcodeDiv = document.getElementById('qrcode');
+            const qrPlaceholder = document.getElementById('qr-placeholder');
+            const errorMessage = document.getElementById('error-message');
+            
+            let qrcodeInstance = null;
+
+            // Função para gerar o QR Code
+            const generateQRCode = () => {
+                const url = urlInput.value.trim();
+
+                // Validação básica
+                if (!url) {
+                    urlInput.classList.add('border-red-500', 'ring-red-500');
+                    errorMessage.classList.remove('hidden');
+                    return;
+                }
+
+                // Remove estados de erro se existirem
+                urlInput.classList.remove('border-red-500', 'ring-red-500');
+                errorMessage.classList.add('hidden');
+
+                // Limpa o QR code anterior, se houver
+                qrcodeDiv.innerHTML = '';
+                
+                // Oculta placeholder e mostra div do QR
+                qrPlaceholder.classList.add('hidden');
+                qrcodeDiv.classList.remove('hidden');
+                qrcodeDiv.classList.add('fade-in');
+
+                // Gera o novo QR Code usando a biblioteca QRCode.js
+                qrcodeInstance = new QRCode(qrcodeDiv, {
+                    text: url,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H // Nível de correção de erro alto (melhor qualidade)
+                });
+
+                // Mostra o botão de download com animação após um breve atraso
+                // (necessário para dar tempo da biblioteca renderizar a imagem/canvas)
+                setTimeout(() => {
+                    downloadBtn.classList.remove('hidden');
+                    downloadBtn.classList.add('fade-in');
+                }, 100);
+            };
+
+            // Evento de clique no botão Gerar
+            generateBtn.addEventListener('click', generateQRCode);
+
+            // Permite gerar pressionando "Enter" no campo de texto
+            urlInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    generateQRCode();
+                }
+            });
+
+            // Função para baixar o QR Code gerado
+            downloadBtn.addEventListener('click', () => {
+                // A biblioteca QRCode.js cria um <canvas> e uma <img> (às vezes a img demora um pouco para preencher o base64).
+                // Vamos tentar pegar a imagem primeiro, se falhar, pegamos o canvas.
+                const img = qrcodeDiv.querySelector('img');
+                const canvas = qrcodeDiv.querySelector('canvas');
+                
+                let imageUrl = '';
+
+                if (img && img.getAttribute('src')) {
+                    imageUrl = img.getAttribute('src');
+                } else if (canvas) {
+                    imageUrl = canvas.toDataURL("image/png");
+                }
+
+                if (imageUrl) {
+                    // Cria um elemento <a> temporário para forçar o download
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = imageUrl;
+                    downloadLink.download = 'meu-qrcode.png';
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                } else {
+                    // Feedback caso algo dê errado (embora improvável)
+                    console.error("Não foi possível gerar a imagem para download.");
+                }
+            });
+            
+            // Remove o alerta visual de erro quando o usuário começa a digitar
+            urlInput.addEventListener('input', () => {
+                if(urlInput.classList.contains('border-red-500')) {
+                    urlInput.classList.remove('border-red-500', 'ring-red-500');
+                    errorMessage.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
