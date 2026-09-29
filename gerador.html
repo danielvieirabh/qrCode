@@ -141,9 +141,10 @@
         <p style="font-size: 14px; color: #666; margin-top: 0;">Clique no botão abaixo para abrir a ferramenta oficial. Role um pouco a página, digite o nome da empresa no mapa e copie a sequência chamada <strong>Place ID</strong>.</p>
         
         <div class="action-box">
-            <a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" class="btn">
-                🗺️ Abrir Buscador do Google (Nova Aba)
-            </a>
+            <!-- Botão alterado para chamar a função JavaScript do Pop-up -->
+            <button onclick="abrirMapaFlutuante()" class="btn">
+                🗺️ Abrir Buscador do Google (Pop-up)
+            </button>
             <p style="font-size: 13px; color: #64748b; margin-top: 15px;"><em>Você não precisará pagar nada. Apenas pesquise, copie o código e volte aqui.</em></p>
         </div>
     </div>
@@ -168,6 +169,20 @@
 
 <script>
     let linkFinal = "";
+
+    // Nova função para abrir o Pop-up centralizado
+    function abrirMapaFlutuante() {
+        const largura = 800;
+        const altura = 600;
+        const esquerda = (screen.width - largura) / 2;
+        const topo = (screen.height - altura) / 2;
+        
+        window.open(
+            'https://developers.google.com/maps/documentation/places/web-service/place-id', 
+            'PopupGoogle', 
+            `width=${largura},height=${altura},top=${topo},left=${esquerda},resizable=yes,scrollbars=yes,status=no,menubar=no,toolbar=no`
+        );
+    }
 
     function gerarLink() {
         // Pega o valor e tira os espaços que podem vir na hora de copiar
