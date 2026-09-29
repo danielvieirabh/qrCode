@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador Gratuito NFC - Vai Anima</title>
+    <style>
+        :root {
+            --primary: #4285F4; /* Azul Google */
+            --primary-hover: #3367D6;
+            --success: #10b981;
+            --dark: #1f2937;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --border: #e5e7eb;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            color: var(--dark);
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            border-top: 5px solid var(--primary);
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Nova caixa de aviso e botão */
+        .action-box {
+            background-color: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        input[type="text"] {
+            flex: 1;
+            min-width: 250px;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+        }
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover { background-color: var(--primary-hover); }
+        .btn-success { background-color: var(--success); }
+        .btn-success:hover { background-color: #059669; }
+
+        .result-box {
+            margin-top: 20px;
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 15px;
+            display: none;
+            text-align: center;
+        }
+        .link-preview {
+            background: #fff;
+            padding: 10px;
+            border: 1px dashed #22c55e;
+            border-radius: 6px;
+            font-family: monospace;
+            word-break: break-all;
+            color: #166534;
+            margin-top: 10px;
+            font-size: 15px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" class="back-link">← Voltar para o Painel</a>
+    
+    <div class="header">
+        <h1 style="margin:0;">⭐ Gerador de Link NFC (Modo Gratuito)</h1>
+        <p>Gere os links de avaliação de forma rápida e 100% gratuita.</p>
+    </div>
+
+    <!-- PASSO 1: Botão para abrir o mapa do Google -->
+    <div class="card">
+        <div class="step-title">📍 Passo 1: Pegar o Código no Google</div>
+        <p style="font-size: 14px; color: #666; margin-top: 0;">Clique no botão abaixo para abrir a ferramenta oficial. Role um pouco a página, digite o nome da empresa no mapa e copie a sequência chamada <strong>Place ID</strong>.</p>
+        
+        <div class="action-box">
+            <a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" class="btn">
+                🗺️ Abrir Buscador do Google (Nova Aba)
+            </a>
+            <p style="font-size: 13px; color: #64748b; margin-top: 15px;"><em>Você não precisará pagar nada. Apenas pesquise, copie o código e volte aqui.</em></p>
+        </div>
+    </div>
+
+    <!-- PASSO 2: Colar e gerar o link -->
+    <div class="card" style="border-top-color: var(--success);">
+        <div class="step-title" style="color: var(--success);">🔗 Passo 2: Gerar o link da Placa</div>
+        
+        <div class="input-group">
+            <input type="text" id="placeIdInput" placeholder="Cole aqui o Place ID (Ex: ChIJu9...)" autocomplete="off">
+            <button class="btn btn-success" id="generateBtn" onclick="gerarLink()">Gerar Link Mágico</button>
+        </div>
+
+        <div class="result-box" id="result-box">
+            <p style="margin: 0; font-weight: bold; color: #15803d;">✅ Seu link de 5 estrelas está pronto!</p>
+            <div class="link-preview" id="link-preview"></div>
+            <button class="btn btn-success" style="margin-top: 15px; width: 100%;" onclick="copiarLink()">📋 Copiar Link para o NFC Tools</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let linkFinal = "";
+
+    function gerarLink() {
+        // Pega o valor e tira os espaços que podem vir na hora de copiar
+        const input = document.getElementById('placeIdInput').value.trim();
+        
+        if (!input) {
+            alert("Por favor, cole o Place ID no campo primeiro!");
+            return;
+        }
+
+        // Monta o link que abre a janela de 5 estrelas do Google
+        linkFinal = "https://search.google.com/local/writereview?placeid=" + input;
+        
+        // Mostra na tela
+        document.getElementById('link-preview').innerText = linkFinal;
+        document.getElementById('result-box').style.display = 'block';
+    }
+
+    function copiarLink() {
+        if (!linkFinal) return;
+        
+        navigator.clipboard.writeText(linkFinal).then(() => {
+            alert("✅ Link copiado com sucesso! Agora é só abrir o app NFC Tools, ir em 'Escrever' > 'Adicionar um registro' > 'URL' e colar.");
+        }).catch(err => {
+            alert("Erro ao tentar copiar. Por favor, selecione o link verde e copie manualmente.");
+        });
+    }
+</script>
+
+</body>
+</html>
