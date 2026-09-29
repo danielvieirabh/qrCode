@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador Gratuito NFC - Vai Anima</title>
+    <title>Gerador Gratuito NFC - Uai Animo</title>
     <style>
         :root {
-            --primary: #4285F4; /* Azul Google */
-            --primary-hover: #3367D6;
-            --success: #10b981;
+            --primary: #1a3e62; /* Azul Escuro Uai Animo */
+            --primary-hover: #2c5987;
+            --accent: #2c5987;
             --dark: #1f2937;
-            --bg: #f3f4f6;
+            --bg: #eef2f7; /* Fundo suave */
             --card-bg: #ffffff;
-            --border: #e5e7eb;
+            --border: #d1d5db;
         }
         body {
-            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
             margin: 0;
             padding: 20px;
@@ -29,50 +29,69 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            max-width: 150px; /* Tamanho da logo no cabeçalho */
+            height: auto;
+            margin-bottom: 15px;
+        }
+        .header h1 {
+            color: var(--primary);
+            margin: 0;
+            font-size: 26px;
+            font-weight: 700;
+        }
+        .header p {
+            color: #64748b;
+            font-size: 15px;
+            margin-top: 8px;
         }
         .card {
             background-color: var(--card-bg);
             border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(26, 62, 98, 0.1);
+            margin-bottom: 25px;
             border-top: 5px solid var(--primary);
         }
         
         .step-title {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             color: var(--primary);
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
-        /* Nova caixa de aviso e botão */
+        /* Caixa de aviso e botão */
         .action-box {
             background-color: #f8fafc;
-            border: 2px dashed #cbd5e1;
-            border-radius: 8px;
+            border: 2px dashed #94a3b8;
+            border-radius: 10px;
             padding: 30px 20px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-top: 15px;
+            margin-bottom: 10px;
         }
 
         .input-group {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
+            margin-top: 15px;
         }
         input[type="text"] {
             flex: 1;
             min-width: 250px;
-            padding: 15px;
+            padding: 15px 20px;
             font-size: 16px;
             border: 2px solid var(--border);
             border-radius: 8px;
             outline: none;
+            transition: border-color 0.3s ease;
         }
         input[type="text"]:focus {
             border-color: var(--primary);
@@ -81,47 +100,66 @@
         .btn {
             background-color: var(--primary);
             color: white;
-            border: none;
+            border: 2px solid var(--primary);
             padding: 15px 25px;
             border-radius: 8px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
         }
-        .btn:hover { background-color: var(--primary-hover); }
-        .btn-success { background-color: var(--success); }
-        .btn-success:hover { background-color: #059669; }
+        .btn:hover { 
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(26, 62, 98, 0.2);
+        }
+        
+        /* Botão Secundário para Copiar/Gerar com contraste sutil */
+        .btn-action {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        .btn-action:hover {
+            background-color: var(--primary-hover);
+        }
 
         .result-box {
-            margin-top: 20px;
-            background-color: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            border-radius: 8px;
-            padding: 15px;
+            margin-top: 25px;
+            background-color: #f0f4f8; /* Azul muito claro */
+            border: 1px solid #c9d7e5;
+            border-radius: 10px;
+            padding: 20px;
             display: none;
             text-align: center;
         }
         .link-preview {
             background: #fff;
-            padding: 10px;
-            border: 1px dashed #22c55e;
+            padding: 12px;
+            border: 1px dashed var(--primary);
             border-radius: 6px;
             font-family: monospace;
             word-break: break-all;
-            color: #166534;
-            margin-top: 10px;
+            color: var(--primary);
+            margin-top: 12px;
             font-size: 15px;
         }
 
         .back-link {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             margin-bottom: 20px;
             color: var(--primary);
             text-decoration: none;
             font-weight: bold;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+        .back-link:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -131,37 +169,38 @@
     <a href="index.html" class="back-link">← Voltar para o Painel</a>
     
     <div class="header">
-        <h1 style="margin:0;">⭐ Gerador de Link NFC (Modo Gratuito)</h1>
+        <!-- Logo Uai Animo inserida aqui -->
+        <img src="uaianimosemfundo.png" alt="Logo Uai Animo" class="logo">
+        <h1>⭐ Gerador de Link NFC (Google)</h1>
         <p>Gere os links de avaliação de forma rápida e 100% gratuita.</p>
     </div>
 
     <!-- PASSO 1: Botão para abrir o mapa do Google -->
     <div class="card">
         <div class="step-title">📍 Passo 1: Pegar o Código no Google</div>
-        <p style="font-size: 14px; color: #666; margin-top: 0;">Clique no botão abaixo para abrir a ferramenta oficial. Role um pouco a página, digite o nome da empresa no mapa e copie a sequência chamada <strong>Place ID</strong>.</p>
+        <p style="font-size: 15px; color: #475569; margin-top: 0; line-height: 1.5;">Clique no botão abaixo para abrir a ferramenta oficial. Role um pouco a página, digite o nome da empresa no mapa e copie a sequência chamada <strong>Place ID</strong>.</p>
         
         <div class="action-box">
-            <!-- Botão alterado para chamar a função JavaScript do Pop-up -->
             <button onclick="abrirMapaFlutuante()" class="btn">
                 🗺️ Abrir Buscador do Google (Pop-up)
             </button>
-            <p style="font-size: 13px; color: #64748b; margin-top: 15px;"><em>Você não precisará pagar nada. Apenas pesquise, copie o código e volte aqui.</em></p>
+            <p style="font-size: 14px; color: #64748b; margin-top: 15px;"><em>Você não precisará pagar nada. Apenas pesquise, copie o código e volte aqui.</em></p>
         </div>
     </div>
 
     <!-- PASSO 2: Colar e gerar o link -->
-    <div class="card" style="border-top-color: var(--success);">
-        <div class="step-title" style="color: var(--success);">🔗 Passo 2: Gerar o link da Placa</div>
+    <div class="card">
+        <div class="step-title">🔗 Passo 2: Gerar o link da Placa</div>
         
         <div class="input-group">
             <input type="text" id="placeIdInput" placeholder="Cole aqui o Place ID (Ex: ChIJu9...)" autocomplete="off">
-            <button class="btn btn-success" id="generateBtn" onclick="gerarLink()">Gerar Link Mágico</button>
+            <button class="btn btn-action" id="generateBtn" onclick="gerarLink()">Gerar Link Mágico</button>
         </div>
 
         <div class="result-box" id="result-box">
-            <p style="margin: 0; font-weight: bold; color: #15803d;">✅ Seu link de 5 estrelas está pronto!</p>
+            <p style="margin: 0; font-weight: bold; color: var(--primary); font-size: 18px;">✅ Seu link de 5 estrelas está pronto!</p>
             <div class="link-preview" id="link-preview"></div>
-            <button class="btn btn-success" style="margin-top: 15px; width: 100%;" onclick="copiarLink()">📋 Copiar Link para o NFC Tools</button>
+            <button class="btn btn-action" style="margin-top: 20px; width: 100%;" onclick="copiarLink()">📋 Copiar Link para o NFC Tools</button>
         </div>
     </div>
 
@@ -170,7 +209,6 @@
 <script>
     let linkFinal = "";
 
-    // Nova função para abrir o Pop-up centralizado
     function abrirMapaFlutuante() {
         const largura = 800;
         const altura = 600;
@@ -185,7 +223,6 @@
     }
 
     function gerarLink() {
-        // Pega o valor e tira os espaços que podem vir na hora de copiar
         const input = document.getElementById('placeIdInput').value.trim();
         
         if (!input) {
@@ -193,10 +230,8 @@
             return;
         }
 
-        // Monta o link que abre a janela de 5 estrelas do Google
         linkFinal = "https://search.google.com/local/writereview?placeid=" + input;
         
-        // Mostra na tela
         document.getElementById('link-preview').innerText = linkFinal;
         document.getElementById('result-box').style.display = 'block';
     }
@@ -207,7 +242,7 @@
         navigator.clipboard.writeText(linkFinal).then(() => {
             alert("✅ Link copiado com sucesso! Agora é só abrir o app NFC Tools, ir em 'Escrever' > 'Adicionar um registro' > 'URL' e colar.");
         }).catch(err => {
-            alert("Erro ao tentar copiar. Por favor, selecione o link verde e copie manualmente.");
+            alert("Erro ao tentar copiar. Por favor, selecione o link e copie manualmente.");
         });
     }
 </script>
